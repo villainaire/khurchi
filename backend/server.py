@@ -472,7 +472,8 @@ async def create_booking(payload: BookingCreate):
 
 @api_router.get("/track/{job_number}")
 async def track_booking(job_number: str):
-    doc = await db.bookings.find_one({"job_number": job_number.upper().strip()}, {"_id": 0})
+    key = re.sub(r"\s+", "", (job_number or "")).upper()
+    doc = await db.bookings.find_one({"job_number": key}, {"_id": 0})
     if not doc:
         raise HTTPException(status_code=404, detail="Request not found")
     # Public-safe fields only

@@ -15,22 +15,33 @@ export default function TrackPage() {
   const [q, setQ] = useState(jobNumber || "");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
+  const [lastSearched, setLastSearched] = useState("");
   const [err, setErr] = useState("");
 
   const doSearch = async (num) => {
-    if (!num?.trim()) return;
+    const clean = (num || "").replace(/\s+/g, "").toUpperCase();
+    if (!clean || clean === lastSearched) return;
+    setLastSearched(clean);
     setLoading(true); setErr(""); setData(null);
     try {
-      const r = await api.get(`/track/${num.trim().toUpperCase()}`);
+      const r = await api.get(`/track/${encodeURIComponent(clean)}`);
       setData(r.data);
     } catch (e) {
-      setErr(errMessage(e, "Request not found. Please check the number."));
+      const status = e?.response?.status;
+      const friendly = status === 404 ? "Request not found. Please check the number." : errMessage(e, "Something went wrong. Please try again.");
+      setErr(friendly);
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { if (jobNumber) doSearch(jobNumber); }, [jobNumber]);
+  useEffect(() => { if (jobNumber) { setQ(jobNumber.toUpperCase()); doSearch(jobNumber); } }, [jobNumber]);
 
-  const onSubmit = (e) => { e.preventDefault(); if (!q.trim()) { toast.error("Enter a job number"); return; } nav(`/track/${q.trim().toUpperCase()}`); };
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const clean = q.replace(/\s+/g, "").toUpperCase();
+    if (!clean) { toast.error("Enter a job number"); return; }
+    if (clean !== jobNumber) nav(`/track/${clean}`, { replace: true });
+    doSearch(clean);
+  };
 
   const currentIdx = data ? Math.max(0, STAGES.indexOf(data.status)) : -1;
   const isCancelled = data?.status === "Cancelled";
