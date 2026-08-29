@@ -1,97 +1,46 @@
-# Khurchi.com — Cloudflare-Native Architecture
+# Khurchi.com — Chair Care Network (Mumbai, Thane & Navi Mumbai)
 
-Professional Doorstep Chair Care Network across Mumbai, Thane & Navi Mumbai.
+A full-stack chair repair & servicing platform built for Google AI Studio with Google Cloud Firestore database, atomic sequential job numbering (`KHR-YYYY-000001`), server-side Resend email notifications, customer live tracking, and an executive administration dashboard.
 
-## Production Cloudflare Architecture
+---
 
-```
-React / Vite Single Page Application (Served via Cloudflare Assets)
-        ↓
-Cloudflare Worker API (TypeScript + Hono)
-        ↓
-Cloudflare D1 Database (khurchi-db: 3d39c135-2004-4cad-b93a-ba410ae435d7)
-        ↓
-Cloudflare R2 Storage (Bucket: khurchi-uploads for customer chair images)
-        ↓
-Resend Email API (Real-time booking notification dispatch)
+## 🏛️ Architecture Overview
+
+- **Frontend**: React 18 + Vite + Tailwind CSS + Lucide Icons + Framer Motion.
+- **Backend**: Node.js + Express server proxying secure API routes (`/api/*`).
+- **Database**: Google Cloud Firestore (`firebase-blueprint.json` and `firestore.rules`).
+- **Email Service**: Resend API (`/api/bookings` triggers email notifications with full diagnostic details).
+- **Security**:
+  - Zero client-side database secrets.
+  - JWT HS256 admin tokens.
+  - Public tracking privacy masking (customer name and phone are masked, internal notes and cost estimates are never exposed on `/api/track/:jobNumber`).
+
+---
+
+## 🔑 Environment Variables
+
+The following variables can be configured in Google AI Studio Settings or `.env`:
+
+```env
+# Optional Resend API Key for dispatching email notifications to the owner
+RESEND_API_KEY=
+
+# Recipient email for booking notifications (defaults to akashkamble.jb007@gmail.com)
+NOTIFICATION_EMAIL=akashkamble.jb007@gmail.com
+
+# Business email
+BUSINESS_EMAIL=info@khurchi.com
+
+# Admin Authentication
+ADMIN_EMAIL=info@khurchi.com
+ADMIN_PASSWORD=ulhasnagar@khurchi
+JWT_SECRET=khurchi_jwt_secret_mumbai_2026
 ```
 
 ---
 
-## Cloudflare Resources & Bindings
+## 🛠️ Scripts
 
-### 1. Cloudflare D1 Database
-- **Database Name**: `khurchi-db`
-- **Binding Name**: `DB`
-- **Database ID**: `3d39c135-2004-4cad-b93a-ba410ae435d7`
-- **Migrations Directory**: `migrations/`
-
-### 2. Cloudflare R2 Bucket
-- **Bucket Name**: `khurchi-uploads`
-- **Binding Name**: `BUCKET`
-
-### 3. Required Secrets (Cloudflare Worker Environment)
-Set these in Cloudflare using `wrangler secret put`:
-```bash
-npx wrangler secret put RESEND_API_KEY
-npx wrangler secret put JWT_SECRET
-npx wrangler secret put ADMIN_EMAIL
-npx wrangler secret put ADMIN_PASSWORD
-npx wrangler secret put NOTIFICATION_EMAIL
-npx wrangler secret put BUSINESS_EMAIL
-```
-
----
-
-## Deployment Instructions
-
-### Prerequisites
-1. Log in to your Cloudflare account:
-   ```bash
-   npx wrangler login
-   ```
-
-2. Create the R2 bucket (if not already created):
-   ```bash
-   npx wrangler r2 bucket create khurchi-uploads
-   ```
-
-### Step 1: Run D1 Database Migrations
-Apply the initial schema and tables to your remote Cloudflare D1 database:
-```bash
-npx wrangler d1 migrations apply khurchi-db --remote
-```
-
-### Step 2: Build and Deploy to Cloudflare Workers
-Build the frontend and deploy the fullstack Worker application:
-```bash
-npm run build
-npx wrangler deploy
-```
-
----
-
-## Local Development
-
-Start the local development server:
-```bash
-npm run dev
-```
-The application will be available at `http://localhost:3000`.
-
----
-
-## Atomic Job Number Generation
-Job numbers are generated safely and atomically per calendar year using SQLite `ON CONFLICT(year) DO UPDATE ... RETURNING current_seq` to ensure zero duplicates:
-```
-KHR-2026-000001
-```
-
-## Email Notifications
-When a customer books a chair service, the Cloudflare Worker sends an HTML & text notification via the **Resend API** to `NOTIFICATION_EMAIL` with full details including:
-- Customer Name, Phone, and Email
-- Chair Type & Service Area
-- Complete Street Address & Landmark
-- Problem Description & Service Tags
-- Preferred Date & Time Window
-- Job Number & Booking Timestamp
+- `npm run dev`: Starts the full-stack server with Vite middleware on port 3000.
+- `npm run build`: Compiles Vite static assets to `dist/` and bundles `server.ts` to `dist/server.cjs`.
+- `npm start`: Runs the production bundled server.

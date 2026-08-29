@@ -1,11 +1,10 @@
-// worker/auth.ts
+// server/auth.ts
 import * as jose from "jose";
-import type { Env } from "./types";
 
 const DEFAULT_JWT_SECRET = "khurchi_jwt_secret_mumbai_2026";
 
-export async function signAdminToken(email: string, env: Env): Promise<string> {
-  const secretString = env.JWT_SECRET || DEFAULT_JWT_SECRET;
+export async function signAdminToken(email: string): Promise<string> {
+  const secretString = process.env.JWT_SECRET || DEFAULT_JWT_SECRET;
   const secretKey = new TextEncoder().encode(secretString);
 
   const jwt = await new jose.SignJWT({
@@ -21,11 +20,10 @@ export async function signAdminToken(email: string, env: Env): Promise<string> {
 }
 
 export async function verifyAdminToken(
-  token: string,
-  env: Env
+  token: string
 ): Promise<{ email: string; role: string } | null> {
   try {
-    const secretString = env.JWT_SECRET || DEFAULT_JWT_SECRET;
+    const secretString = process.env.JWT_SECRET || DEFAULT_JWT_SECRET;
     const secretKey = new TextEncoder().encode(secretString);
 
     const { payload } = await jose.jwtVerify(token, secretKey, {

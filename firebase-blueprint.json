@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "Booking": {
+      "title": "Booking",
+      "description": "Chair repair and servicing request across Mumbai, Thane and Navi Mumbai",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "job_number": { "type": "string" },
+        "customer_name": { "type": "string" },
+        "customer_phone": { "type": "string" },
+        "customer_email": { "type": "string" },
+        "chair_type": { "type": "string" },
+        "issue_description": { "type": "string" },
+        "issue_tags": { "type": "array", "items": { "type": "string" } },
+        "service_area": { "type": "string" },
+        "address": { "type": "string" },
+        "preferred_date": { "type": "string" },
+        "preferred_time": { "type": "string" },
+        "photos": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string" },
+        "assigned_technician_name": { "type": "string" },
+        "internal_notes": { "type": "string" },
+        "estimated_cost": { "type": "number" },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "status": { "type": "string" },
+              "at": { "type": "string" },
+              "by": { "type": "string" }
+            }
+          }
+        },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": [
+        "id",
+        "job_number",
+        "customer_name",
+        "customer_phone",
+        "chair_type",
+        "issue_description",
+        "service_area",
+        "address",
+        "preferred_date",
+        "preferred_time",
+        "status",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "Counter": {
+      "title": "Counter",
+      "description": "Atomic job numbering sequence counter per calendar year",
+      "type": "object",
+      "properties": {
+        "year": { "type": "number" },
+        "current_seq": { "type": "number" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["year", "current_seq"]
+    }
+  },
+  "firestore": {
+    "/bookings/{bookingId}": {
+      "entity": "Booking",
+      "description": "All customer chair repair requests and history"
+    },
+    "/counters/{counterId}": {
+      "entity": "Counter",
+      "description": "Annual sequential job counter records"
+    }
+  }
+}

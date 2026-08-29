@@ -1,5 +1,5 @@
-// worker/email.ts
-import type { Env, BookingResponse } from "./types";
+// server/email.ts
+import type { BookingRecord } from "./types";
 
 export interface SendBookingEmailResult {
   sent: boolean;
@@ -8,12 +8,11 @@ export interface SendBookingEmailResult {
 }
 
 export async function sendBookingNotificationEmail(
-  booking: BookingResponse,
-  env: Env
+  booking: BookingRecord
 ): Promise<SendBookingEmailResult> {
-  const apiKey = env.RESEND_API_KEY;
-  const recipient = env.NOTIFICATION_EMAIL || "akashkamble.jb007@gmail.com";
-  const businessFrom = env.BUSINESS_EMAIL || "onboarding@resend.dev";
+  const apiKey = process.env.RESEND_API_KEY;
+  const recipient = process.env.NOTIFICATION_EMAIL || "akashkamble.jb007@gmail.com";
+  const businessFrom = process.env.BUSINESS_EMAIL || "Khurchi Bookings <onboarding@resend.dev>";
 
   if (!apiKey) {
     console.warn("RESEND_API_KEY is not configured; skipping email dispatch.");
@@ -141,7 +140,7 @@ Job Number: ${booking.job_number}
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Resend API failed with status ${response.status}: ${errorText}`);
+      console.error(`Resend API returned status ${response.status}: ${errorText}`);
       return {
         sent: false,
         error: `Resend error: ${response.status} - ${errorText}`,
@@ -154,7 +153,7 @@ Job Number: ${booking.job_number}
       messageId: data.id,
     };
   } catch (err: any) {
-    console.error("Failed to send booking email via Resend:", err);
+    console.error("Failed to send booking notification email via Resend:", err);
     return {
       sent: false,
       error: err?.message || "Network exception during Resend call",
