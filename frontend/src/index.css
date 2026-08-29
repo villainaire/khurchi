@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: Manrope, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #F9F6F0;
+  color: #1A2B22;
+}
+
+@layer base {
+  :root {
+    --background: 42 40% 96%;
+    --foreground: 145 15% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 145 15% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 145 15% 13%;
+    --primary: 145 27% 24%;
+    --primary-foreground: 42 40% 96%;
+    --secondary: 36 26% 90%;
+    --secondary-foreground: 145 15% 13%;
+    --muted: 36 26% 90%;
+    --muted-foreground: 145 8% 39%;
+    --accent: 32 51% 53%;
+    --accent-foreground: 42 40% 96%;
+    --destructive: 0 45% 45%;
+    --destructive-foreground: 42 40% 96%;
+    --border: 36 22% 85%;
+    --input: 36 22% 85%;
+    --ring: 145 27% 24%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-khurchi-bg text-khurchi-ink; }
+}
+
+/* Selection */
+::selection { background: #2C4C3B; color: #F9F6F0; }
+
+/* Utility classes */
+.font-display { font-family: "Playfair Display", Georgia, serif; }
+
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+.underline-brush {
+  background-image: linear-gradient(120deg, rgba(196,139,71,0.35) 0%, rgba(196,139,71,0.35) 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 32%;
+  background-position: 0 82%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html { scroll-behavior: smooth; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #F9F6F0; }
+::-webkit-scrollbar-thumb { background: #E2DCD0; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #C48B47; }
