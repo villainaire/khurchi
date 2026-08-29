@@ -72,7 +72,7 @@ export default function HomePage() {
 
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }} className="lg:col-span-5 relative">
             <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-khurchi-bg2 border border-khurchi-border">
-              <img src="https://images.unsplash.com/photo-1769255119622-1bd8e49ff35c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2MzR8MHwxfHNlYXJjaHwyfHxwcmVtaXVtJTIwb2ZmaWNlJTIwY2hhaXIlMjBpc29sYXRlZHxlbnwwfHx8fDE3ODgwMDc3ODZ8MA&ixlib=rb-4.1.0&q=85" alt="Premium chair" className="w-full h-full object-cover" />
+              <img src="https://images.unsplash.com/photo-1580480055273-228ff5388ef8?crop=entropy&cs=srgb&fm=jpg&w=1200&q=80" alt="Premium office chair" className="w-full h-full object-cover" />
               <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute top-6 left-6 bg-white/90 backdrop-blur-md rounded-2xl px-4 py-3 border border-white/60 shadow-lg">
                 <div className="text-[10px] uppercase tracking-[0.2em] text-khurchi-mute">Job Number</div>
                 <div className="font-display text-lg text-khurchi-ink">KHR-2026-000123</div>
@@ -147,7 +147,7 @@ export default function HomePage() {
           </div>
           <div className="mt-16 grid lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-7 relative aspect-[4/5] max-w-lg mx-auto w-full bg-khurchi-bg/5 rounded-3xl border border-khurchi-bg/10 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1769255119622-1bd8e49ff35c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2MzR8MHwxfHNlYXJjaHwyfHxwcmVtaXVtJTIwb2ZmaWNlJTIwY2hhaXIlMjBpc29sYXRlZHxlbnwwfHx8fDE3ODgwMDc3ODZ8MA&ixlib=rb-4.1.0&q=85" alt="Chair diagnostics" className="w-full h-full object-cover opacity-70" />
+              <img src="https://images.unsplash.com/photo-1580480055273-228ff5388ef8?crop=entropy&cs=srgb&fm=jpg&w=1200&q=80" alt="Office chair diagnostics" className="w-full h-full object-cover opacity-70" />
               {DIAGNOSTICS.map((d) => (
                 <button key={d.id} data-testid={`diag-hotspot-${d.id}`} onMouseEnter={() => setActive(d.id)} onMouseLeave={() => setActive(null)} onClick={() => setActive(active === d.id ? null : d.id)} style={{ top: d.top, left: d.left }} className={`absolute -translate-x-1/2 -translate-y-1/2 group`}>
                   <motion.span animate={{ scale: active === d.id ? 1.4 : 1 }} className={`block w-4 h-4 rounded-full ring-4 ring-khurchi-accent/25 ${active === d.id ? "bg-khurchi-accent" : "bg-khurchi-bg"}`} />
