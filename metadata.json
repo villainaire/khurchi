@@ -1,0 +1,8 @@
+{
+  "name": "Khurchi.com",
+  "description": "Mumbai's Chair Care Network. Professional chair repair, upholstery, wheel replacement, hydraulic and mechanism repair at your doorstep across Mumbai, Thane and Navi Mumbai.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
