@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Search, Loader2, CheckCircle2, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { api } from "@/lib/api";
+import { api, errMessage } from "@/lib/api";
 import { toast } from "sonner";
 
 const STAGES = ["Request Received", "Service Review", "Team Dispatched", "In Progress", "Completed"];
@@ -24,7 +24,7 @@ export default function TrackPage() {
       const r = await api.get(`/track/${num.trim().toUpperCase()}`);
       setData(r.data);
     } catch (e) {
-      setErr(e?.response?.data?.detail || "Request not found. Please check the number.");
+      setErr(errMessage(e, "Request not found. Please check the number."));
     } finally { setLoading(false); }
   };
 

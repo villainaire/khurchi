@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Loader2, Lock, ArrowLeft } from "lucide-react";
-import { api, setAuthToken } from "@/lib/api";
+import { api, setAuthToken, errMessage } from "@/lib/api";
 
 export default function AdminLoginPage() {
   const nav = useNavigate();
@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
       toast.success("Welcome back");
       nav("/admin");
     } catch (err) {
-      toast.error(err?.response?.data?.detail || "Login failed");
+      toast.error(errMessage(err, "Login failed"));
     } finally { setLoading(false); }
   };
 

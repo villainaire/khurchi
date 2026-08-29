@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { LogOut, Search as SearchIcon, RefreshCw, Loader2, X, Phone, Mail, MapPin, User, ImageIcon } from "lucide-react";
-import { api, setAuthToken, getAuthToken } from "@/lib/api";
+import { api, setAuthToken, getAuthToken, errMessage } from "@/lib/api";
 
 const STATUSES = ["Request Received", "Service Review", "Team Dispatched", "In Progress", "Completed", "Cancelled"];
 const AREAS = ["", "South Mumbai", "Andheri West", "Andheri East", "Bandra West", "Bandra East", "Powai", "Malad", "Borivali", "Dadar", "Lower Parel", "Worli", "Thane West", "Thane East", "Navi Mumbai", "Vashi", "Kharghar", "Kalyan", "Dombivli", "Ulhasnagar"];
@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
       if (detail?.job_number === job) setDetail(r.data);
       toast.success("Updated");
       const s = await api.get("/admin/bookings/stats"); setStats(s.data);
-    } catch (e) { toast.error(e?.response?.data?.detail || "Update failed"); }
+    } catch (e) { toast.error(errMessage(e, "Update failed")); }
   };
 
   return (

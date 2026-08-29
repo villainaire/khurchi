@@ -1,0 +1,29 @@
+{
+  "summary": "Frontend-only regression to confirm the React crash 'Objects are not valid as a React child (found: object with keys {type, loc, msg, input, ctx})' is fixed by the new errMessage() helper. Forced real server 422s through the UI using Playwright request interception (mutating the outgoing POST /api/bookings and PATCH /api/admin/bookings/{job} bodies) so the actual axios error path in the app was exercised. All 7 checks passed: (1) 422 on booking submit renders a readable toast 'customer_phone: String should have at least 10 characters, preferred_time: Field required' with no React crash and no error overlay, user stays on the form; (2) valid booking submit succeeds and lands on /book/success with job number KHR-2026-000005; (3) /track with 'KHR-INVALID' shows friendly string 'Request not found' in [data-testid=track-error]; (4) /admin/login with wrong password shows toast 'Invalid email or password'; (5) valid admin login reaches /admin dashboard; (6) forced 422 on admin PATCH shows 'estimated_cost: Input should be a valid number, unable to parse string as a number' with zero pageerrors; (7) valid admin PATCH shows 'Updated' toast and persists (audit history entry added). No pageerror events and no [object Object] leakage anywhere. Backend re-verified implicitly: POST /api/bookings returned 200 for a valid payload.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "No fixes required for the reported bug - the errMessage() helper works on all 4 call sites (BookingPage submit, TrackPage doSearch, AdminLoginPage submit, AdminDashboardPage applyPatch).",
+    "Optional cleanup: booking KHR-2026-000006 (customer 'fgsg') was used for the admin PATCH test - its status is now 'Service Review' and assigned technician is 'TEST Tech Valid'. Also test booking KHR-2026-000005 (TEST QA User) was created by the happy-path test; delete/reset if this data matters."
+  ],
+  "critical_code_review_comments": [
+    "errMessage() is correct but falls back to err.message before the supplied fallback, so a network failure surfaces raw axios text like 'Network Error'/'Request failed with status code 500' to end users. Consider only using err.message for non-HTTP (no response) errors, and using the human fallback whenever err.response exists.",
+    "BookingPage.jsx onUpload() aborts the whole loop on the first failed upload and still shows a single generic toast - per-file error reporting would be clearer, but not a blocker."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (single POST /api/bookings happy-path re-verified)", "frontend": "100% (7/7 checks passed)"},
+  "seed_data_creation": "Created booking KHR-2026-000005 (TEST QA User, 9876543210) via the happy-path form test. Modified existing booking KHR-2026-000006 during the admin PATCH test (status -> Service Review, technician -> 'TEST Tech Valid').",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": false,
+  "test_credentials": "/app/memory/test_credentials.md is EMPTY (only header comments). Admin creds used came from the review request: info@khurchi.com / ulhasnagar@khurchi - both work. Main agent should record them in /app/memory/test_credentials.md.",
+  "context_for_next_testing_agent": "React-child crash is confirmed fixed; no need to retest it. Reproduction technique that works well here: page.route('**/api/bookings', handler) and mutate request.post_data before route.continue_() to force a genuine pydantic 422 through the real app error path. Untested this iteration (deferred by request): admin filters/search/stats endpoints, photo upload flow, and the full backend suite. /app/backend/tests/ does not exist yet - a pytest suite still needs to be created.",
+  "rca_of_the_issue": "FastAPI returns 422 with detail as a list of pydantic error dicts. Previously that list was passed straight into toast.error()/setErr(), so React tried to render an object and threw. The fix (errMessage in /app/frontend/src/lib/api.js) flattens the array into 'loc: msg' strings joined by commas, stringifies plain-object details, and falls back to err.message/fallback - verified to always return a string in both the array-detail (422) and string-detail (401/404) cases."
+}

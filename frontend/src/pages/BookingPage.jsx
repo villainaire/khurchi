@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Upload, X, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { api } from "@/lib/api";
+import { api, errMessage } from "@/lib/api";
 
 const TAGS = ["Chair is sinking", "Broken wheel", "Torn upholstery", "Hydraulic issue", "Tilt mechanism issue", "Loose or damaged parts", "Other"];
 
@@ -67,7 +67,7 @@ export default function BookingPage() {
       }
       toast.success("Photo uploaded");
     } catch (e) {
-      toast.error(e?.response?.data?.detail || "Upload failed");
+      toast.error(errMessage(e, "Upload failed"));
     } finally { setUploading(false); ev.target.value = ""; }
   };
 
@@ -82,7 +82,7 @@ export default function BookingPage() {
       toast.success("Request received");
       nav("/book/success", { state: r.data });
     } catch (err) {
-      toast.error(err?.response?.data?.detail || "Could not submit your request. Please try again.");
+      toast.error(errMessage(err, "Could not submit your request. Please try again."));
     } finally { setSubmitting(false); }
   };
 
