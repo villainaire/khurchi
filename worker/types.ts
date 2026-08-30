@@ -1,12 +1,4 @@
-// server/types.ts
-
-export type ChairType =
-  | "Office Chair"
-  | "Gaming Chair"
-  | "Executive Chair"
-  | "Dining Chair"
-  | "Visitor Chair"
-  | "Other";
+// worker/types.ts
 
 export type BookingStatus =
   | "Request Received"
@@ -35,7 +27,7 @@ export interface BookingRecord {
   address: string;
   preferred_date: string;
   preferred_time: string;
-  photos: string[];
+  photos_count: number;
   status: BookingStatus;
   assigned_technician_name: string | null;
   internal_notes: string | null;
@@ -45,10 +37,16 @@ export interface BookingRecord {
   updated_at: string;
 }
 
-export interface CreateBookingInput {
+export interface BookingPhotoPayload {
+  filename: string;
+  contentType: string;
+  base64: string;
+}
+
+export interface CreateBookingRequest {
   customer_name: string;
   customer_phone: string;
-  customer_email?: string;
+  customer_email?: string | null;
   chair_type: string;
   issue_description: string;
   issue_tags?: string[];
@@ -56,12 +54,16 @@ export interface CreateBookingInput {
   address: string;
   preferred_date: string;
   preferred_time: string;
-  photos?: string[];
+  photos?: BookingPhotoPayload[];
 }
 
-export interface UpdateBookingInput {
-  status?: BookingStatus;
-  assigned_technician_name?: string;
-  internal_notes?: string;
-  estimated_cost?: number;
+export interface Env {
+  DB: D1Database;
+  ASSETS?: Fetcher;
+  RESEND_API_KEY?: string;
+  JWT_SECRET?: string;
+  ADMIN_EMAIL?: string;
+  ADMIN_PASSWORD?: string;
+  NOTIFICATION_EMAIL?: string;
+  BUSINESS_EMAIL?: string;
 }

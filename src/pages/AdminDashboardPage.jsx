@@ -211,16 +211,12 @@ function DetailDrawer({ booking, onClose, onPatch }) {
             <Row label="Created" value={new Date(booking.created_at).toLocaleString()} />
           </section>
 
-          {booking.photos?.length > 0 && (
+          {(booking.photos_count > 0 || booking.photos?.length > 0) && (
             <section className="bg-white border border-khurchi-border rounded-2xl p-6">
-              <div className="text-xs uppercase tracking-[0.2em] text-khurchi-mute mb-3 flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Photos</div>
-              <div className="grid grid-cols-3 gap-3">
-                {booking.photos.map((p) => (
-                  <a key={p} href={`${api.defaults.baseURL}/files/${p}`} target="_blank" rel="noreferrer" className="aspect-square rounded-xl overflow-hidden border border-khurchi-border">
-                    <img src={`${api.defaults.baseURL}/files/${p}`} alt="" className="w-full h-full object-cover" />
-                  </a>
-                ))}
-              </div>
+              <div className="text-xs uppercase tracking-[0.2em] text-khurchi-mute mb-2 flex items-center gap-2"><ImageIcon className="w-4 h-4 text-khurchi-brand" /> Attached Photos</div>
+              <p className="text-sm text-khurchi-ink">
+                <span className="font-semibold">{booking.photos_count || booking.photos?.length} customer photo(s)</span> attached & delivered via notification email to the field operations team.
+              </p>
             </section>
           )}
 

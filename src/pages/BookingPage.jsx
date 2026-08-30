@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Upload, X, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { api, errMessage } from "@/lib/api";
+import { compressImage, validatePhotosPayload, MAX_PHOTOS } from "@/lib/imageCompressor";
 
 const TAGS = ["Chair is sinking", "Broken wheel", "Torn upholstery", "Hydraulic issue", "Tilt mechanism issue", "Loose or damaged parts", "Other"];
 
@@ -58,27 +59,53 @@ export default function BookingPage() {
     if (!files.length) return;
     setUploading(true);
     try {
-      for (const file of files) {
-        if (form.photos.length >= 5) { toast.warning("You can upload up to 5 photos"); break; }
-        const fd = new FormData();
-        fd.append("file", file);
-        const r = await api.post("/upload", fd, { headers: { "Content-Type": "multipart/form-data" } });
-        setForm((p) => ({ ...p, photos: [...p.photos, r.data.path] }));
+      const remainingSlots = MAX_PHOTOS - form.photos.length;
+      if (remainingSlots <= 0) {
+        toast.warning(`You can upload up to ${MAX_PHOTOS} photos`);
+        return;
       }
-      toast.success("Photo uploaded");
+
+      const filesToProcess = files.slice(0, remainingSlots);
+      const compressedList = [];
+
+      for (const file of filesToProcess) {
+        try {
+          const compressed = await compressImage(file);
+          compressedList.push(compressed);
+        } catch (err) {
+          toast.error(err?.message || "Failed to process image");
+        }
+      }
+
+      const candidatePhotos = [...form.photos, ...compressedList];
+      validatePhotosPayload(candidatePhotos);
+      setForm((p) => ({ ...p, photos: candidatePhotos }));
+      toast.success(`${compressedList.length} photo(s) added`);
     } catch (e) {
       toast.error(errMessage(e, "Upload failed"));
-    } finally { setUploading(false); ev.target.value = ""; }
+    } finally {
+      setUploading(false);
+      ev.target.value = "";
+    }
   };
 
-  const removePhoto = (p) => setForm((prev) => ({ ...prev, photos: prev.photos.filter((x) => x !== p) }));
+  const removePhoto = (index) => setForm((prev) => ({ ...prev, photos: prev.photos.filter((_, i) => i !== index) }));
 
   const submit = async (e) => {
     e.preventDefault();
     if (!validate()) { toast.error("Please fix the highlighted fields"); return; }
     setSubmitting(true);
     try {
-      const r = await api.post("/bookings", form);
+      const payload = {
+        ...form,
+        photos: form.photos.map((p) => ({
+          filename: p.filename,
+          contentType: p.contentType,
+          base64: p.base64,
+        })),
+      };
+
+      const r = await api.post("/bookings", payload);
       toast.success("Request received");
       nav("/book/success", { state: r.data });
     } catch (err) {
@@ -169,18 +196,18 @@ export default function BookingPage() {
           {/* Photos */}
           <section>
             <h2 className="font-display text-2xl text-khurchi-ink">Photos (optional)</h2>
-            <p className="text-sm text-khurchi-mute mt-1">Up to 5 images. Helps our team prepare the right parts.</p>
+            <p className="text-sm text-khurchi-mute mt-1">Up to {MAX_PHOTOS} images. Helps our team prepare the right parts.</p>
             <div className="mt-4 flex flex-wrap gap-4">
-              {form.photos.map((p) => (
-                <div key={p} className="relative w-28 h-28 rounded-xl overflow-hidden border border-khurchi-border">
-                  <img src={`${api.defaults.baseURL}/files/${p}`} alt="upload" className="w-full h-full object-cover" />
-                  <button type="button" onClick={() => removePhoto(p)} className="absolute top-1 right-1 bg-khurchi-ink/80 text-khurchi-bg rounded-full p-1"><X className="w-3 h-3" /></button>
+              {form.photos.map((p, idx) => (
+                <div key={idx} className="relative w-28 h-28 rounded-xl overflow-hidden border border-khurchi-border">
+                  <img src={p.previewUrl} alt="preview" className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => removePhoto(idx)} className="absolute top-1 right-1 bg-khurchi-ink/80 text-khurchi-bg rounded-full p-1"><X className="w-3 h-3" /></button>
                 </div>
               ))}
-              {form.photos.length < 5 && (
+              {form.photos.length < MAX_PHOTOS && (
                 <label className="w-28 h-28 rounded-xl border-2 border-dashed border-khurchi-border flex flex-col items-center justify-center text-khurchi-mute hover:border-khurchi-brand hover:text-khurchi-brand cursor-pointer transition-colors" data-testid="upload-photo">
                   {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Upload className="w-5 h-5" /><span className="text-xs mt-2">Upload</span></>}
-                  <input type="file" accept="image/*" multiple className="hidden" onChange={onUpload} />
+                  <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={onUpload} />
                 </label>
               )}
             </div>
